@@ -13,17 +13,26 @@ class SvgDraw{
     this.h = 0
     this.w = 0
     this.paths = new SvgPaths()
+    this.landscape = false
 
     // Resize the svg and svg viewBox
+    this.callback = null
     this.sizer = (e) => {
-      this.w = e.currentTarget.innerWidth;
+      this.w = e.currentTarget.innerWidth
       this.h = e.currentTarget.innerHeight
       this.svg.style.setProperty('width', this.w)
       this.svg.style.setProperty('height', this.h)
       this.svg.setAttribute('viewBox',`0 0 ${this.w} ${this.h}`)
+      this.landscape = (this.w > this.h)
+      if(this.callback != null){
+        this.callback({w:this.w, h:this.h, landscape: this.landscape})
+      }
     }
-
-
+    this.elementStyle = () => {
+      return{
+        overflow: 'hidden'
+      }
+    }
     // Set up the window resize event listners depending on frame-size attribute
     this.setUpWindowSizer = () =>{
       var size = this.element.getAttribute('frame-size')
@@ -31,6 +40,8 @@ class SvgDraw{
       switch (size){
         case 'fullscreen':
           window.addEventListener('resize', this.sizer)
+          // window.addEventListener("orientationchange", this.sizer);
+          this.element.setAttribute('style',jsonToStyle(this.elementStyle()))
           this.sizer({currentTarget: window})
         break;
         case 'element':
@@ -42,17 +53,27 @@ class SvgDraw{
 
 
     this.setUpPenEvents = () => {
+      this.element.addEventListener('touchend', (e) => {
+          e.preventDefault();
+      })
       this.element.addEventListener('touchstart', (e) => {
-        if(e.target == this.svg){
+        if(e.target == this.svg&&!showPicker){
           this.svg.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))
         }
       })
       this.element.addEventListener('touchmove', (e) => {
-        this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)
+        e.preventDefault();
+        if(e.target == this.svg&&!showPicker){
+          this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)
+        }
       })
     }
     this.setUpPenEvents()
 
+  }
+  sizeUpdate(callback){
+    this.callback = callback
+    this.callback({w:this.w, h:this.h, landscape: this.landscape})
   }
   undo(){
     let to_remove = this.paths.undo();
@@ -69,40 +90,101 @@ class SvgDraw{
   setPenStyle(style){
     this.paths.setPenStyle(style)
   }
+  clear(){
+    this.paths.clear()
+    this.svg.innerHTML = ''
+  }
 }
-
+let showPicker = false
 class SvgTools{
   constructor(svgdraw){
+    //An svgDraw object
     this.svgdraw = svgdraw
 
-
+    // --------------- BUTTON SETUP ----------------//
+    // --------- MAIN PANNEL SETUP----------------//
     this.mainPannel = document.createElement("DIV")
-    this.mainStyle = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: 'calc(100% - 2*10px)',
-      height: '50px',
-      padding: '10px',
-      'z-index': '3'
-    }
-    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
     this.svgdraw.element.appendChild(this.mainPannel)
-    this.buttonStyle = {
-      width: '44px',
-      height: '44px',
-      border: '3px solid rgba(255, 255, 255, 0.5)',
-      'border-radius': '50px',
-      display: 'inline-block',
+
+
+
+    //---------------------BUTTON SETUP------------------------//
+    this.btnSize = '50px';
+    this.margin = '20px'
+    this.buttonStyles = (landscape) => {
+      return{
+        baseStyle:{
+          width: `calc(${this.btnSize}* 0.88)`,
+          height: `calc(${this.btnSize}* 0.88)`,
+          border: `calc(${this.btnSize} * 0.06) solid rgba(255, 255, 255, 0.5)`,
+          'border-radius': `calc(${this.btnSize} * 0.6)`,
+          display: 'inline-block',
+          position: 'fixed',
+          transition: '0.3s ease-in'
+        },
+        undo: {
+          top: this.margin,
+          left: this.margin
+        },
+        redo: {
+          top : landscape?  `calc(100% - ${this.btnSize} - ${this.margin})` : this.margin,
+          left: landscape?  this.margin                                     : `calc(100% - ${this.btnSize} - ${this.margin})`,
+        },
+        color: {
+          top : landscape ?  `calc(50% - ${this.btnSize} / 2)`  : this.margin,
+          left: landscape ?  this.margin                        : `calc(50% - ${this.btnSize} / 2)`,
+        },
+        save: {
+          bottom: this.margin,
+          right: this.margin
+        }
+      }
     }
+
     this.color = document.createElement("DIV")
-    this.back = document.createElement("DIV")
-    this.forward = document.createElement("DIV")
+    this.undo = document.createElement("DIV")
+    this.redo = document.createElement("DIV")
+    this.save = document.createElement("DIV")
+    this.labelStyle = () => {
+      return{
+        'line-height': `calc(${this.btnSize}* 0.88)`,
+        'text-align': 'center',
+        'color': 'rgba(255, 255, 255, 0.5)',
+        width: '100%'
+      }
+    }
+    this.label_redo = document.createElement("div")
+    this.redo.appendChild(this.label_redo)
+    this.label_redo.innerHTML = 'R'
 
-    this.back.setAttribute('style', jsonToStyle(this.buttonStyle) + '; float: left');
-    this.forward.setAttribute('style', jsonToStyle(this.buttonStyle) + '; float: right');
-    this.color.setAttribute('style', jsonToStyle(this.buttonStyle) + `; position: absolute; left: calc(50% - 25px); background: ${this.svgdraw.paths.penStyle.stroke}`);
+    this.label_undo = document.createElement("div")
+    this.undo.appendChild(this.label_undo)
+    this.label_undo.innerHTML = 'U'
 
+    this.label_save = document.createElement("div")
+    this.save.appendChild(this.label_save)
+    this.label_save.innerHTML = 's'
+
+    this.save_callback = null
+
+    this.updateButtons = (dim) => {
+      this.label_undo.setAttribute('style',jsonToStyle(this.labelStyle()))
+      this.label_redo.setAttribute('style',jsonToStyle(this.labelStyle()))
+      this.label_save.setAttribute('style',jsonToStyle(this.labelStyle()))
+      let styles = this.buttonStyles(dim.landscape)
+      for (style in styles){
+        if(style != "baseStyle"){
+          this[style].setAttribute('style', jsonToStyle(Object.assign(styles[style], styles.baseStyle)))
+        }
+      }
+      this.color.style.setProperty('background', this.svgdraw.paths.penStyle.stroke)
+    }
+    this.mainPannel.appendChild(this.undo)
+    this.mainPannel.appendChild(this.redo)
+    this.mainPannel.appendChild(this.color)
+    this.mainPannel.appendChild(this.save)
+
+    //------------------------COLOR PICKER----------------------//
     this.colorPickerElement = document.createElement("DIV")
     this.pickerStyle = {
       margin: '25px',
@@ -110,7 +192,7 @@ class SvgTools{
       top: '1000%',
       left: 0,
       right: 0,
-      transition: '0.4s ease-in'
+      transition: '0.5s ease-in'
     }
     this.pickerShown = false
     this.colorPickerElement.setAttribute('style', jsonToStyle(this.pickerStyle))
@@ -145,6 +227,7 @@ class SvgTools{
         },
       ]
     })
+    // ----------------------- Callback SETUP ----------------------------//
     this.colorPicker.on('color:change', (color) => {
       // if the first color changed
       if (color.index === 0) {
@@ -159,44 +242,41 @@ class SvgTools{
         this.svgdraw.redo();
       }
     });
-    this.back.addEventListener('touchstart', () => {
+    this.undo.addEventListener('touchstart', () => {
       this.svgdraw.undo()
     })
-    this.forward.addEventListener('click', () => {
+    this.redo.addEventListener('touchstart', () => {
       this.svgdraw.redo()
     })
-    this.color.addEventListener('click', () => {
+    this.save.addEventListener('touchstart', () => {
+      this.svgdraw.clear()
+      if(this.save_callback != null)this.save_callback(this.svgdraw.svg)
+    })
+    this.color.addEventListener('touchstart', () => {
+      console.log('this');
       this.pickerShown = !this.pickerShown
+      showPicker = !showPicker
       if(this.pickerShown){
         this.colorPickerElement.style.setProperty('top', '50px')
       }else{
         this.colorPickerElement.style.setProperty('top', '1000%')
       }
     })
-
-    this.mainPannel.appendChild(this.back)
-    this.mainPannel.appendChild(this.forward)
-    this.mainPannel.appendChild(this.color)
+    this.svgdraw.sizeUpdate((e) => {
+      this.updateButtons(e)
+    })
   }
-  setLandscape(){
-    this.mainStyle.width = '100px'
-    this.mainStyle.height = '100%'
-    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
-
-  }
-  setPortrait(){
-    this.mainStyle.width = '100%'
-    this.mainStyle.height = '100px'
-    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
-  }
-  setPenColor(){
-
+  onSave(callback){
+    this.save_callback = callback
   }
 }
 let jsonToStyle = (styles) => {
   style_string = ""
   for (style in styles){
-    style_string += `${style}: ${styles[style]};`
+    value = styles[style]
+    if (value != null){
+      style_string += `${style}: ${value};`
+    }
   }
   return style_string.substring(0, style_string.length-1)
 }
@@ -216,6 +296,7 @@ class SvgPaths{
       stroke: 'white',
       'stroke-width': 6,
     }
+    this.r2d = (x) => {return Math.round(x*100)/100}
   }
 
   setPenStyle(style){
@@ -228,7 +309,7 @@ class SvgPaths{
     this.pathElements.push(this.currentPath)
     this.history = [];
 
-    let d = `M${x},${y}L${x},${y}`
+    let d = `M${this.r2d(x)},${this.r2d(y)}L${this.r2d(x)},${this.r2d(y)}`
 
     this.currentPath.setAttribute('style', jsonToStyle(this.penStyle) + ';stroke-linejoin: round; stroke-linecap: round')
     this.currentPath.setAttribute("d", d)
@@ -252,7 +333,7 @@ class SvgPaths{
     let avg = this.runSum.assign()
     avg.div(new Point(this.n, this.n))
     var d = this.currentPath.getAttribute('d')
-    d += `L${avg.x},${avg.y}`
+    d += `L${this.r2d(avg.x)},${this.r2d(avg.y)}`
     this.currentPath.setAttribute('d', d)
   }
   undo(){
@@ -272,5 +353,9 @@ class SvgPaths{
     }else{
       return null
     }
+  }
+  clear(){
+    this.pathElements = [];
+    this.history = []
   }
 }

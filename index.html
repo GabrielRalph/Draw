@@ -5,27 +5,29 @@
   <title>Draw</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
   <meta name="Draw" content="Draw something">
   <script type="text/javascript" src="./points.js"></script>
   <script type="text/javascript" src="./draw.js"></script>
+  <link rel="stylesheet" href="https://www.hub.guru/my-fonts.css">
   <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src= "https://www.gstatic.com/firebasejs/7.14.4/firebase.js"></script>
+
 <body>
   <draw frame-size = "fullscreen" class = "main-draw-pad"></draw>
 </body>
 <script type="text/javascript" src="./main.js"></script>
 <style>
-
+body{
+  font-family: 'Guru';
+  background: rgba(0, 0, 0, 0.95);
+}
 .main-draw-pad{
   position: fixed;
   top: 0;
   left: 0;
 }
-body{
-  --c1: red;
-  --c2: green;
-  --c3: blue;
-}
+
 .colors{
   width: calc(100% - 100px);
   text-align: center;
@@ -42,6 +44,7 @@ i{
   color: rgb(255, 250, 240);
 }
 svg{
+
 width:100%;
 height: 100%;
 }
