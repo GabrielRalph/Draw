@@ -6,32 +6,13 @@ class SvgDraw{
     if (this.element === 'none'){
       console.error('No element assigned');
     }
-
+    this.background = 'rgb(10, 10, 10)'
     this.svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+    this.svg.setAttribute('style',`background: ${this.background}`)
     this.element.appendChild(this.svg)
     this.h = 0
     this.w = 0
     this.paths = new SvgPaths()
-
-    this.back = document.createElementNS("http://www.w3.org/2000/svg", 'path')
-    this.foward = document.createElementNS("http://www.w3.org/2000/svg", 'path')
-    this.createButtons = (sb) => {
-      this.back.setAttribute('d',`M0,${sb}A${sb},${sb},0,0,0,${sb},0L0,0, Z`);
-      this.back.setAttribute('fill','#DDDDDD');
-      this.back.setAttribute('stroke','#DDDDDD');
-      this.back.addEventListener('click', ()=>{
-        this.svg.removeChild(this.paths.undo());
-      })
-      this.svg.appendChild(this.back)
-
-      this.foward.setAttribute('d',`M${this.w},${sb}A${sb},${sb},0,0,1,${this.w - sb},0L${this.w},0, Z`);
-      this.foward.setAttribute('fill','#DDDDDD');
-      this.foward.setAttribute('stroke','#DDDDDD');
-      this.foward.addEventListener('click', ()=>{
-        this.svg.removeChild(this.paths.redo());
-      })
-      this.svg.appendChild(this.foward)
-    }
 
     // Resize the svg and svg viewBox
     this.sizer = (e) => {
@@ -56,14 +37,19 @@ class SvgDraw{
           this.element.addEventListener('resize', this.sizer)
           this.sizer({currentTarget: this.element})
       }
-      this.createButtons(100)
     }
     this.setUpWindowSizer()
 
 
     this.setUpPenEvents = () => {
-      this.element.addEventListener('touchstart', (e) => {this.svg.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))})
-      this.element.addEventListener('touchmove', (e) => {this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)})
+      this.element.addEventListener('touchstart', (e) => {
+        if(e.target == this.svg){
+          this.svg.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))
+        }
+      })
+      this.element.addEventListener('touchmove', (e) => {
+        this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)
+      })
     }
     this.setUpPenEvents()
 
@@ -85,6 +71,138 @@ class SvgDraw{
   }
 }
 
+class SvgTools{
+  constructor(svgdraw){
+    this.svgdraw = svgdraw
+
+
+    this.mainPannel = document.createElement("DIV")
+    this.mainStyle = {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: 'calc(100% - 2*10px)',
+      height: '50px',
+      padding: '10px',
+      'z-index': '3'
+    }
+    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
+    this.svgdraw.element.appendChild(this.mainPannel)
+    this.buttonStyle = {
+      width: '44px',
+      height: '44px',
+      border: '3px solid rgba(255, 255, 255, 0.5)',
+      'border-radius': '50px',
+      display: 'inline-block',
+    }
+    this.color = document.createElement("DIV")
+    this.back = document.createElement("DIV")
+    this.forward = document.createElement("DIV")
+
+    this.back.setAttribute('style', jsonToStyle(this.buttonStyle) + '; float: left');
+    this.forward.setAttribute('style', jsonToStyle(this.buttonStyle) + '; float: right');
+    this.color.setAttribute('style', jsonToStyle(this.buttonStyle) + `; position: absolute; left: calc(50% - 25px); background: ${this.svgdraw.paths.penStyle.stroke}`);
+
+    this.colorPickerElement = document.createElement("DIV")
+    this.pickerStyle = {
+      margin: '25px',
+      position: 'absolute',
+      top: '1000%',
+      left: 0,
+      right: 0,
+      transition: '0.4s ease-in'
+    }
+    this.pickerShown = false
+    this.colorPickerElement.setAttribute('style', jsonToStyle(this.pickerStyle))
+    this.mainPannel.appendChild(this.colorPickerElement)
+    this.colorPicker = new iro.ColorPicker(this.colorPickerElement, {
+      color: '#f6ff00',
+      padding: 0,
+      sliderSize: 35,
+      borderWidth: 3,
+      handleRadius: 10,
+      width: this.colorPickerElement.clientWidth,
+      margin: 30,
+      layout: [
+        {
+          component: iro.ui.Wheel,
+          options: {
+            wheelAngle: 45,
+            borderColor: '#ffffff',
+          }
+        },
+        {
+          component: iro.ui.Slider,
+          options: {
+            sliderType: 'saturation' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
+          }
+        },
+        {
+          component: iro.ui.Slider,
+          options: {
+            sliderType: 'value' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
+          }
+        },
+      ]
+    })
+    this.colorPicker.on('color:change', (color) => {
+      // if the first color changed
+      if (color.index === 0) {
+        this.color.style.setProperty('background', color.hexString)
+        this.svgdraw.paths.penStyle.stroke = color.hexString
+      }
+    });
+    document.addEventListener('keydown', function(event) {
+      if (event.ctrlKey && event.key === 'z') {
+        this.svgdraw.undo();
+      }else if (event.ctrlKey && event.key === 'y'){
+        this.svgdraw.redo();
+      }
+    });
+    this.back.addEventListener('touchstart', () => {
+      this.svgdraw.undo()
+    })
+    this.forward.addEventListener('click', () => {
+      this.svgdraw.redo()
+    })
+    this.color.addEventListener('click', () => {
+      this.pickerShown = !this.pickerShown
+      if(this.pickerShown){
+        this.colorPickerElement.style.setProperty('top', '50px')
+      }else{
+        this.colorPickerElement.style.setProperty('top', '1000%')
+      }
+    })
+
+    this.mainPannel.appendChild(this.back)
+    this.mainPannel.appendChild(this.forward)
+    this.mainPannel.appendChild(this.color)
+  }
+  setLandscape(){
+    this.mainStyle.width = '100px'
+    this.mainStyle.height = '100%'
+    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
+
+  }
+  setPortrait(){
+    this.mainStyle.width = '100%'
+    this.mainStyle.height = '100px'
+    this.mainPannel.setAttribute('style', jsonToStyle(this.mainStyle))
+  }
+  setPenColor(){
+
+  }
+}
+let jsonToStyle = (styles) => {
+  style_string = ""
+  for (style in styles){
+    style_string += `${style}: ${styles[style]};`
+  }
+  return style_string.substring(0, style_string.length-1)
+}
+let setStyle = (styles) => {
+  return setAttribute('style', jsonToStyle(styles))
+}
 class SvgPaths{
   constructor(avg = 9){
     this.pathElements = [];
@@ -111,9 +229,8 @@ class SvgPaths{
     this.history = [];
 
     let d = `M${x},${y}L${x},${y}`
-    for (var key in this.penStyle){
-      this.currentPath.setAttribute(key, this.penStyle[key])
-    }
+
+    this.currentPath.setAttribute('style', jsonToStyle(this.penStyle) + ';stroke-linejoin: round; stroke-linecap: round')
     this.currentPath.setAttribute("d", d)
     this.currentPath.setAttribute("fill", 'none')
 

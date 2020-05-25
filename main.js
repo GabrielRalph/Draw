@@ -11,3 +11,5 @@ document.addEventListener('keydown', function(event) {
     mydrawpad.redo();
   }
 });
+
+let mytools = new SvgTools(mydrawpad)
