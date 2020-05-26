@@ -69,6 +69,19 @@ class DrawBrailSVG{
       }
     }
   }
+
+  download(){
+    this.svg.setAttribute('width',`${this.width}mm`)
+    this.svg.setAttribute('height',`${this.height}mm`)
+    var text = this.svg.outerHTML
+    var text = `${text.split('><')[0]}>${this.svg.innerHTML}</svg>`
+    var blob = new Blob([text], {type: "text/plain"});
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = 'brail_stencil.svg';
+    a.click();
+  }
 }
 let ferransBrail = new DrawBrailSVG(document.getElementsByTagName('brail-svg')[0], {margin: 10})
 ferransBrail.drawSVG()
@@ -83,3 +96,7 @@ for(var i = 0; i < inputs.length; i++){
     }
   })
 }
+var download = document.getElementById('download')
+download.addEventListener('click', ()=>{
+  ferransBrail.download()
+})
