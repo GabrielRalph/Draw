@@ -13,11 +13,12 @@ class DrawBrailSVG{
     this.rows = 4
     this.columns = 20
     this.margin = 10
-    this.ss = 'stroke: black; fill: none; stroke-width: 0.1'
+    this.ss = 'stroke: black; fill: none'
     Object.assign(this, options)
     this.width = (this.columns - 1)*this.letterSpacing_pattern + this.dotSpacing + 2*this.margin
     this.height = (this.rows - 1)*this.lineSpacing_pattern + 2*this.dotSpacing + 2*this.margin
     this.svg = this.createSvgObject('svg')
+    this.svg.setAttribute('style','stroke-width: 0.25')
     this.svg.setAttribute('viewBox', `-${this.margin} -${this.margin} ${this.width} ${this.height}`)
     element.appendChild(this.svg)
     this.add = (elem) => {
@@ -73,6 +74,7 @@ class DrawBrailSVG{
   download(){
     this.svg.setAttribute('width',`${this.width}mm`)
     this.svg.setAttribute('height',`${this.height}mm`)
+    this.svg.setAttribute('style','stroke-width: 0.001')
     var text = this.svg.outerHTML
     var text = `${text.split('><')[0]}>${this.svg.innerHTML}</svg>`
     var blob = new Blob([text], {type: "text/plain"});
@@ -81,22 +83,42 @@ class DrawBrailSVG{
     a.href = url;
     a.download = 'brail_stencil.svg';
     a.click();
+    this.svg.setAttribute('style','stroke-width: 0.25')
+    this.svg.setAttribute('width',`100vw`)
+  }
+  print(){
+    this.svg.setAttribute('width',`${this.width}mm`)
+    this.svg.setAttribute('height',`${this.height}mm`)
+   var originalContents = document.body.innerHTML;
+   document.body.innerHTML = '';
+   document.body.appendChild(this.svg);
+   window.print();
+   document.body.innerHTML = originalContents;
+   this.svg.setAttribute('width',`100vw`)
+   initButtons();
   }
 }
 let ferransBrail = new DrawBrailSVG(document.getElementsByTagName('brail-svg')[0], {margin: 10})
 ferransBrail.drawSVG()
+let initButtons = () => {
+  var inputs = document.getElementsByTagName('input')
+  for(var i = 0; i < inputs.length; i++){
+    inputs[i].value = ferransBrail[inputs[i].id]
+    inputs[i].addEventListener('input', (e) => {
+      if(e.target.value != 0){
+        ferransBrail[e.target.id] = parseFloat(e.target.value)
+        ferransBrail.drawSVG()
+      }
+    })
+  }
+  var download = document.getElementById('download')
+  download.addEventListener('click', ()=>{
+    ferransBrail.download()
+  })
 
-var inputs = document.getElementsByTagName('input')
-for(var i = 0; i < inputs.length; i++){
-  inputs[i].value = ferransBrail[inputs[i].id]
-  inputs[i].addEventListener('input', (e) => {
-    if(e.target.value != 0){
-      ferransBrail[e.target.id] = parseFloat(e.target.value)
-      ferransBrail.drawSVG()
-    }
+  var printer = document.getElementById('printer')
+  printer.addEventListener('click', ()=>{
+    ferransBrail.print()
   })
 }
-var download = document.getElementById('download')
-download.addEventListener('click', ()=>{
-  ferransBrail.download()
-})
+initButtons()
