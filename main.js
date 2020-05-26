@@ -29,6 +29,7 @@ document.addEventListener('keydown', function(event) {
 let mytools = new SvgTools(mydrawpad)
 mytools.onSave((e) => {
   let date = new Date();
-  console.log(firebase);
-  firebase.database().ref(`svgs/${date}`).set(e.outerHTML)
+  var text = `${e.outerHTML.split('><')[0]}>${e.innerHTML}</svg>`
+  text = text.replace(/"/g, "'")
+  firebase.database().ref(`svgs/${date}`).set(text)
 })

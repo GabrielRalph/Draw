@@ -8,11 +8,11 @@ class SvgDraw{
     }
     this.background = 'rgb(10, 10, 10)'
     this.svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-    this.svg.setAttribute('style',`background: ${this.background}`)
+    this.svg.setAttribute('style',`background: ${this.background}; stroke-linejoin: round; stroke-linecap: round`)
     this.element.appendChild(this.svg)
     this.h = 0
     this.w = 0
-    this.paths = new SvgPaths()
+    this.paths = new SvgPaths(5)
     this.landscape = false
 
     // Resize the svg and svg viewBox
@@ -57,13 +57,15 @@ class SvgDraw{
           e.preventDefault();
       })
       this.element.addEventListener('touchstart', (e) => {
-        if(e.target == this.svg&&!showPicker){
+        e.preventDefault();
+        console.log(e);
+        if(e.target.nodeName != 'DIV'&&!showPicker){
           this.svg.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))
         }
       })
       this.element.addEventListener('touchmove', (e) => {
         e.preventDefault();
-        if(e.target == this.svg&&!showPicker){
+        if(e.target.nodeName != 'DIV'&&!showPicker){
           this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)
         }
       })
@@ -105,6 +107,53 @@ class SvgTools{
     // --------- MAIN PANNEL SETUP----------------//
     this.mainPannel = document.createElement("DIV")
     this.svgdraw.element.appendChild(this.mainPannel)
+
+
+
+
+    //------------------------COLOR PICKER----------------------//
+    this.colorPickerElement = document.createElement("DIV")
+    this.pickerStyle = {
+      margin: '25px',
+      position: 'absolute',
+      top: '1000%',
+      left: 0,
+      right: 0,
+      transition: '0.5s ease-in'
+    }
+    this.pickerShown = false
+    this.colorPickerElement.setAttribute('style', jsonToStyle(this.pickerStyle))
+    this.mainPannel.appendChild(this.colorPickerElement)
+    this.colorPicker = new iro.ColorPicker(this.colorPickerElement, {
+      color: '#f6ff00',
+      padding: 0,
+      sliderSize: 35,
+      borderWidth: 3,
+      handleRadius: 10,
+      width: this.colorPickerElement.clientWidth,
+      margin: 30,
+      layout: [
+        {
+          component: iro.ui.Wheel,
+          options: {
+            wheelAngle: 45,
+            borderColor: '#ffffff',
+          }
+        },
+        {
+          component: iro.ui.Slider,
+          options: {
+            sliderType: 'saturation' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
+          }
+        },
+        {
+          component: iro.ui.Slider,
+          options: {
+            sliderType: 'value' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
+          }
+        },
+      ]
+    })
 
 
 
@@ -168,6 +217,7 @@ class SvgTools{
     this.save_callback = null
 
     this.updateButtons = (dim) => {
+      this.colorPicker.layoutDirection = dim.landscape?"horizontal":"vertical"
       this.label_undo.setAttribute('style',jsonToStyle(this.labelStyle()))
       this.label_redo.setAttribute('style',jsonToStyle(this.labelStyle()))
       this.label_save.setAttribute('style',jsonToStyle(this.labelStyle()))
@@ -184,49 +234,11 @@ class SvgTools{
     this.mainPannel.appendChild(this.color)
     this.mainPannel.appendChild(this.save)
 
-    //------------------------COLOR PICKER----------------------//
-    this.colorPickerElement = document.createElement("DIV")
-    this.pickerStyle = {
-      margin: '25px',
-      position: 'absolute',
-      top: '1000%',
-      left: 0,
-      right: 0,
-      transition: '0.5s ease-in'
-    }
-    this.pickerShown = false
-    this.colorPickerElement.setAttribute('style', jsonToStyle(this.pickerStyle))
-    this.mainPannel.appendChild(this.colorPickerElement)
-    this.colorPicker = new iro.ColorPicker(this.colorPickerElement, {
-      color: '#f6ff00',
-      padding: 0,
-      sliderSize: 35,
-      borderWidth: 3,
-      handleRadius: 10,
-      width: this.colorPickerElement.clientWidth,
-      margin: 30,
-      layout: [
-        {
-          component: iro.ui.Wheel,
-          options: {
-            wheelAngle: 45,
-            borderColor: '#ffffff',
-          }
-        },
-        {
-          component: iro.ui.Slider,
-          options: {
-            sliderType: 'saturation' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
-          }
-        },
-        {
-          component: iro.ui.Slider,
-          options: {
-            sliderType: 'value' // can also be 'saturation', 'value', 'alpha' or 'kelvin'
-          }
-        },
-      ]
-    })
+
+
+
+
+
     // ----------------------- Callback SETUP ----------------------------//
     this.colorPicker.on('color:change', (color) => {
       // if the first color changed
@@ -249,8 +261,11 @@ class SvgTools{
       this.svgdraw.redo()
     })
     this.save.addEventListener('touchstart', () => {
+      if(this.save_callback != null){
+        console.log(this.svgdraw.svg);
+        this.save_callback(this.svgdraw.svg)
+      }
       this.svgdraw.clear()
-      if(this.save_callback != null)this.save_callback(this.svgdraw.svg)
     })
     this.color.addEventListener('touchstart', () => {
       console.log('this');
@@ -311,7 +326,7 @@ class SvgPaths{
 
     let d = `M${this.r2d(x)},${this.r2d(y)}L${this.r2d(x)},${this.r2d(y)}`
 
-    this.currentPath.setAttribute('style', jsonToStyle(this.penStyle) + ';stroke-linejoin: round; stroke-linecap: round')
+    this.currentPath.setAttribute('style', jsonToStyle(this.penStyle))
     this.currentPath.setAttribute("d", d)
     this.currentPath.setAttribute("fill", 'none')
 
