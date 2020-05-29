@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Draw</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Draw" />
+  <meta name="Draw" content="Draw something">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="icon" href="favicon.svg">
+  <link rel="apple-touch-icon" href="./assets/logo_01.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="./assets/logoArtboard1_76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./assets/logoArtboard1_120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./assets/logoArtboard1_152x152.png">
+  <link rel="mask-icon" href="./assets/icon_01.svg" color="red">
+
+<body>
+  <button id = "goFS">FULL</button>
+  <svg viewBox = "0 0 100 100" id = "draw-pad" src =""></svg>
+
+</body>
+<script type = "text/javascript">
+window.addEventListener('error',(err) => {
+  alert(err.message)
+})
+var svg = document.getElementById('draw-pad')
+var goFS = document.getElementById("goFS");
+
+
+  goFS.addEventListener("click", function() {
+      svg.requestFullscreen();
+  }, false);
+
+</script>
+<style>
+img{
+  width:100vw;
+}
+  body{
+
+  }
+  #draw-pad{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 120, 0, 0.5)
+  }
+  #goFS{
+    position: fixed;
+    z-index: 3;
+  }
+</style>
+</html>
