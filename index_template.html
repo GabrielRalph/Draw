@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Draw</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, minimal-ui">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Draw" />
   <meta name="Draw" content="Draw something">
@@ -14,27 +14,49 @@
   <link rel="apple-touch-icon" sizes="76x76" href="./assets/logoArtboard1_76x76.png">
   <link rel="apple-touch-icon" sizes="120x120" href="./assets/logoArtboard1_120x120.png">
   <link rel="apple-touch-icon" sizes="152x152" href="./assets/logoArtboard1_152x152.png">
-  <link rel="mask-icon" href="./assets/icon_01.svg" color="red">
+  <!-- <link rel="mask-icon" href="./assets/icon_01.svg" color="red"> -->
 
 <body>
   <button id = "goFS">FULL</button>
-  <svg viewBox = "0 0 100 100" id = "draw-pad" src =""></svg>
+  <iframe id = "draw-pad-frame">
+    <svg id = "draw-pad" viewBox = "0 0 100 100"></svg>
+  </iframe>
 
 </body>
 <script type = "text/javascript">
 window.addEventListener('error',(err) => {
   alert(err.message)
 })
+var iframe = document.getElementById('draw-pad-frame')
 var svg = document.getElementById('draw-pad')
 var goFS = document.getElementById("goFS");
+var vid = document.getElementById("myvideo");
 
-
+alert(window.navigator.standalone)
   goFS.addEventListener("click", function() {
-      svg.requestFullscreen();
-  }, false);
+    if (iframe.requestFullscreen) {
+      alert('1')
+    iframe.requestFullscreen().catch(err => {alert(err.message)})
+  } else if (iframe.mozRequestFullScreen) { /* Firefox */
+    alert('2')
+    iframe.mozRequestFullScreen().catch(err => {alert(err.message)})
+  } else if (iframe.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+    alert('3')
+    iframe.webkitRequestFullscreen().catch(err => {alert(err.message)})
+  } else if (iframe.msRequestFullscreen) { /* IE/Edge */
+    alert('4')
+    iframe.msRequestFullscreen().catch(err => {alert(err.message)})
+  }
+  });
 
 </script>
 <style>
+@media (device-height: 568px) and (height: 529px),
+(device-height: 480px) and (height: 441px) {
+  svg{
+    background: blue;
+  }
+}
 img{
   width:100vw;
 }
