@@ -117,6 +117,8 @@ class SvgTools{
       margin: '25px',
       position: 'absolute',
       top: '1000%',
+      'z-index': '100',
+      // background: 'rgb(255,250,245)',
       left: 0,
       right: 0,
       transition: '0.5s ease-in'
@@ -267,14 +269,20 @@ class SvgTools{
       }
       this.svgdraw.clear()
     })
+    var debug_delay = true
     this.color.addEventListener('touchstart', () => {
-      console.log('this');
-      this.pickerShown = !this.pickerShown
-      showPicker = !showPicker
-      if(this.pickerShown){
-        this.colorPickerElement.style.setProperty('top', '50px')
-      }else{
-        this.colorPickerElement.style.setProperty('top', '1000%')
+
+      if (debug_delay){
+        debug_delay = false;
+        setTimeout(() => {debug_delay = true}, 600)
+        this.pickerShown = !this.pickerShown
+        showPicker = !showPicker
+        if(this.pickerShown){
+          this.colorPickerElement.style.setProperty('top', '50px')
+        }else{
+          this.colorPickerElement.style.setProperty('top', '1000%')
+        }
+
       }
     })
     this.svgdraw.sizeUpdate((e) => {
