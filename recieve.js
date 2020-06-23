@@ -27,6 +27,8 @@ firebase.database().ref('/svgs/').on("child_added", (sc) => {
       console.log(`${3 - elem.clicked_times} times before deletion`);
     }
   })
+
+  elem.children[0].setAttribute('style','background-color: rgb(10, 10, 10); stroke-linejoin: round; stroke-linecap: round; width: 100vw')
   main.appendChild(elem)
   elem.scrollIntoView({block: "center"});
 
