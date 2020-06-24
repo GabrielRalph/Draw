@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg class = "pen-icon" x="0px" y="0px" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  xml:space="preserve">
+
+	<style type="text/css">
+		.pen-icon{
+			stroke-width:15;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			--nib-color: hsl(24, 100%, 50%);
+			--nib-color-shade: hsl(24, 90%, 40%);
+			--nib-color-highlight: hsl(24, 100%, 70%);
+		}
+
+		.nib{
+			fill: var(--nib-color);
+			stroke: var(--nib-color-shade);
+		}
+		.nib-highlight{
+			fill:none;
+			stroke:var(--nib-color-highlight);
+		}
+		.pen{
+			fill:#5181C2;
+			stroke:#4775BA;
+		}
+		.pen-highlight{
+			fill:none;
+			stroke:#6492CC;
+		}
+	</style>
+	<!-- <path d = "M0,0L0,500L500,500L500,0Z" fill = "red"/> -->
+	<path class="nib" d="M231.7,149.1L231.7,149.1c-2.4,15.4-5.1,30.1-6.4,43c-1.1,11.9-2.3,24.2-3,36.1c-1,14.9-11.3,78.6,16.9,74.3c16.5-2.5,37.8-40.1,47.5-54.2c14.4-20.9,38.2-50.3,43.7-75.5C330.5,172.7,272.3,175.7,231.7,149.1z"/>
+	<path class="nib-highlight" d="M242,169.8c-4.1,11.8-6,32.3-7.1,45.5c-1.8,19.7-9.4,60.8,0.8,72.9"/>
+	<path class="pen" d="M398.2,94.4c-81.1,13.1-162.9-23-177.4-46.5l1.8-13.4L234-20.7h211.2L414.5,90.4L398.2,94.4z"/>
+	<path class="pen" d="M241,65.8l-2,9.9c-4.3,16.8-11.1,32.9-14.9,49.8c-3.8,16.8-0.3,24.2,14,33.9c19.3,13.3,43.5,15.9,66.2,17.8c15,1.1,40.6,6.8,47.2-9.9c7.5-19,9.1-46,15.2-69.2C317.5,97.6,272.4,83.6,241,65.8z"/>
+	<path class="pen-highlight" d="M249.1,84.2c-6.1,27.5-14.1,38.3-13.5,56"/>
+	<path class="pen-highlight" d="M246.8-10.7c-0.3,4.1-11.9,54.1-11.5,57.5"/>
+</svg>

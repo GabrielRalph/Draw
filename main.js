@@ -13,23 +13,34 @@ firebase.initializeApp(firebaseConfig);
 // var data = firebase.database();
 // console.log(data);
 
+function created(svg){
+  let x = svg.clientWidth
+  let y = svg.clientHeight
+  console.log(x, y);
+  svg.setAttribute('viewBox',`0 0 ${x} ${y}`)
+}
 
-let mydrawpad = new SvgDraw(document.getElementsByTagName("draw")[0])
-mydrawpad.setPenStyle({
-  stroke: '#f6ff00',
-  'stroke-width': mydrawpad.w/50
-})
-document.addEventListener('keydown', function(event) {
-  if (event.ctrlKey && event.key === 'z') {
-    mydrawpad.undo();
-  }else if (event.ctrlKey && event.key === 'y'){
-    mydrawpad.redo();
-  }
-});
-let mytools = new SvgTools(mydrawpad)
-mytools.onSave((e) => {
-  let date = new Date();
-  var text = `${e.outerHTML.split('><')[0]}>${e.innerHTML}</svg>`
-  text = text.replace(/"/g, "'")
-  firebase.database().ref(`svgs/${date}`).set(text)
-})
+window.onload = () => {
+  let svg = document.getElementById('container')
+  svg.onload = created(svg)
+
+  let mydrawpad = new SvgDraw(document.getElementById('container'))
+  mydrawpad.setPenStyle({
+    stroke: 'hsl(338, 100%, 64%)',
+    'stroke-width': mydrawpad.w/50
+  })
+  document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'z') {
+      mydrawpad.undo();
+    }else if (event.ctrlKey && event.key === 'y'){
+      mydrawpad.redo();
+    }
+  });
+  let mytools = new SvgTools(mydrawpad)
+  mytools.onSave((e) => {
+    let date = new Date();
+    var text = `${e.outerHTML.split('><')[0]}>${e.innerHTML}</svg>`
+    text = text.replace(/"/g, "'")
+    firebase.database().ref(`svgs/${date}`).set(text)
+  })
+}

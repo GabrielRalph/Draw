@@ -1,0 +1,104 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Brail</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="Draw" content="Draw something">
+    <link rel="stylesheet" href="https://www.hub.guru/my-fonts.css">
+
+  <body>
+    <div class = "input-container">
+      <div class = "input">
+        <div>Dot Spacing</div>
+        <input type="number" id = "dotSpacing"/>
+      </div>
+      <div class = "input">
+        <div>Dot Radius</div>
+        <input type="number" id = "dotRadius"/>
+      </div>
+      <div class = "input">
+        <div>Letter Spacing</div>
+        <input type="number" id = "letterSpacing"/>
+      </div>
+      <div class = "input">
+        <div>Line Spacing</div>
+        <input type="number" id = "lineSpacing"/>
+      </div>
+      <div class = "input">
+        <div>Rows</div>
+        <input type="number" id = "rows"/>
+      </div>
+      <div class = "input">
+        <div>Columns</div>
+        <input type="number" id = "columns"/>
+      </div>
+    </div>
+    <div id = "download">
+      Download
+    </div>
+    <div id = "printer">
+      print
+    </div>
+    <brail-svg></brail-svg>
+  </body>
+  <script type="text/javascript" src="./ferran.js"></script>
+  <style>
+  .input-container{
+    margin: 30px;
+  }
+    .input {
+      font-family: 'Guru';
+      line-height: 20px;
+      width: 100vw;
+      height: 50px;
+    }
+    #download{
+      background: rgb(255, 200, 10);
+      font-family: 'Guru';
+      color: white;
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      border-radius: 30px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    #printer{
+      background: rgb(30, 200, 10);
+      font-family: 'Guru';
+      color: white;
+      position: fixed;
+      top: 75px;
+      right: 30px;
+      border-radius: 30px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .input div{
+      float: left;
+      padding: 10px;
+      width: 200px;
+      background: rgb(90, 100, 240);
+      color: white;
+      border-radius: 20px 0 0 20px;
+    }
+    .input input{
+      font-family: 'Guru';
+      line-height: 20px;
+      font-size: 19px;
+      padding: 10px;
+      float: left;
+      background: rgb(180, 200, 240);
+      border-radius: 0 20px 20px 0;
+      outline: none;
+      border: none;
+    }
+    svg{
+      width: 100vw;
+    }
+
+  </style>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Draw</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="Draw" content="Draw something">
+</head>
+<body>
+  <svg id = "drawpad">
+    <i-pen500 id = "pen" x = "0" y = "0" width = "125" height = "125"></i-pen500>
+    <i-undo x = "10" y = "0" width = "75" height = "75"></i-undo>
+    <i-undo x = "740" y = "-575" width = "200" transform = "scale(-1, 1)"></i-undo>
+    <send  x = "570" y = "585" width = "150"></send>
+  </svg>
+
+  <div>
+  </div>
+</body>
+<script type="text/javascript">
+var x = 0;
+var y = 0;
+  window.onload = () => {
+    x = window.outerWidth
+    y = window.outerHeight
+    document.getElementById('pen').setAttribute('x', (x - 180)/2)
+    let drawpad = document.getElementById('drawpad')
+    drawpad.setAttribute('viewBox', `0 0 ${x} ${y}`)
+  }
+</script>
+<script type="text/javascript" src="./smartSvg.js"></script>
+<style>
+  body{
+    margin: 0;
+    background: rgb(255, 230, 240);
+  }
+  #drawpad{
+    width: 100vw;
+    height: 100vh;
+    background: rgb(10, 10, 15);
+  }
+</style>
+</html>

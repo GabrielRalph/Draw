@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="Draw" content="Draw something">
+  <title>Draw</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Draw" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="apple-touch-icon" href="logo_01.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="Assets/logoArtboard 1_76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="Assets/logoArtboard 1_120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="Assets/logoArtboard 1_152x152.png">
+  <!-- <link rel="apple-touch-startup-image" sizes = "750x1334" href="logoArtboard 1750x1334.png"> -->
+
+  <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_1136x640.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="Assets/icon_2436x1125.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_1792x828.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_828x1792.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_1334x750.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="Assets/icon_1242x2688.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="Assets/icon_2208x1242.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="Assets/icon_1125x2436.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="Assets/icon_1242x2208.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_2732x2048.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="Assets/icon_2688x1242.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_2224x1668.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_750x1334.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_2048x2732.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_2388x1668.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_1668x2224.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_640x1136.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="Assets/icon_1668x2388.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="Assets/icon_2048x1536.png"
+    />
+    <script src= "https://www.gstatic.com/firebasejs/7.14.4/firebase.js"></script>
+
+    <script type="text/javascript" src="./sizeof.compressed.js"></script>
+    <script type="text/javascript" src="./PriorityQueue.js"></script>
+    <script type="text/javascript" src="./treeGraphs.js"></script>
+    <script type="text/javascript" src="./TextCompressor.js"></script>
+    <script type="text/javascript" src="./points.js"></script>
+  <script type="text/javascript" src="./SVGElementExt.js"></script>
+  <link rel="stylesheet" href="https://www.hub.guru/my-fonts.css">
+  <link rel="stylesheet" href="./nodeStyles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src= "https://www.gstatic.com/firebasejs/7.14.4/firebase.js"></script>
+
+<body>
+  <draw frame-size = "fullscreen" class = "main-draw-pad"></draw>
+</body>
+<script type="text/javascript" src="./draw.js"></script>
+<script type="text/javascript" src="./main.js"></script>
+<style>
+#tree{
+  width: 100vh;
+  height: 100vh;
+  position: fixed;
+  z-index: 100;
+}
+body{
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  background: black;
+}
+.main-draw-pad{
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.colors{
+  width: calc(100% - 100px);
+  text-align: center;
+  display: inline-block;
+  float: left;
+}
+i{
+  cursor: pointer;
+}
+.colors i{
+  font-size:18px;
+  padding: 16px;
+  border-radius: 35px;
+  color: rgb(255, 250, 240);
+}
+svg{
+
+/* width:100%; */
+/* height: 100%; */
+}
+
+.controls{
+  position: fixed;
+  z-index: 2;
+  width: calc(100% - 2*15px);
+  top: 0;
+  left: 0;
+  padding: 15px;
+}
+.controls > i{
+  font-size: 30px;
+  background: pink;
+  border-radius: 35px;
+  color: rgb(255, 250, 240);
+  padding: 10px;
+}
+</style>
+</html>

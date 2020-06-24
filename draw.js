@@ -1,71 +1,76 @@
 
 
 class SvgDraw{
-  constructor(element = 'none'){
-    this.element = element;
-    if (this.element === 'none'){
+  constructor(svg = 'none'){
+    this.svg = svg;
+    console.log(svg);
+    if (this.svg === 'none'){
       console.error('No element assigned');
     }
-    this.background = 'rgb(10, 10, 10)'
-    this.svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-    this.svg.setAttribute('style',`background: ${this.background}; stroke-linejoin: round; stroke-linecap: round`)
-    this.element.appendChild(this.svg)
-    this.h = 0
-    this.w = 0
+    this.drawSpace = this.svg.getElementById('draw-space');
+    this.drawSpace.setAttribute('style','stroke-linejoin: round; stroke-linecap: round');
+    this.viewBox = this.svg.getAttribute('viewBox')
+    this.drawSpace.setAttribute('viewBox',this.viewBox)
+    // this.h = 0
+    // this.w = 0
     this.paths = new SvgPaths(5)
     this.landscape = false
 
     // Resize the svg and svg viewBox
-    this.callback = null
-    this.sizer = (e) => {
-      this.w = e.currentTarget.innerWidth
-      this.h = e.currentTarget.innerHeight
-      this.svg.style.setProperty('width', this.w)
-      this.svg.style.setProperty('height', this.h)
-      this.svg.setAttribute('viewBox',`0 0 ${this.w} ${this.h}`)
-      this.landscape = (this.w > this.h)
-      if(this.callback != null){
-        this.callback({w:this.w, h:this.h, landscape: this.landscape})
-      }
-    }
+    // this.callback = null
+    // this.sizer = (e) => {
+    //   this.w = e.currentTarget.innerWidth
+    //   this.h = e.currentTarget.innerHeight
+    //   this.svg.style.setProperty('width', this.w)
+    //   this.svg.style.setProperty('height', this.h)
+    //   this.svg.setAttribute('viewBox',`0 0 ${this.w} ${this.h}`)
+    //   this.landscape = (this.w > this.h)
+    //   if(this.callback != null){
+    //     this.callback({w:this.w, h:this.h, landscape: this.landscape})
+    //   }
+    // }
     this.elementStyle = () => {
       return{
         overflow: 'hidden'
       }
     }
     // Set up the window resize event listners depending on frame-size attribute
-    this.setUpWindowSizer = () =>{
-      var size = this.element.getAttribute('frame-size')
-      console.log(size);
-      switch (size){
-        case 'fullscreen':
-          window.addEventListener('resize', this.sizer)
-          // window.addEventListener("orientationchange", this.sizer);
-          this.element.setAttribute('style',jsonToStyle(this.elementStyle()))
-          this.sizer({currentTarget: window})
-        break;
-        case 'element':
-          this.element.addEventListener('resize', this.sizer)
-          this.sizer({currentTarget: this.element})
-      }
-    }
-    this.setUpWindowSizer()
+    // this.setUpWindowSizer = () =>{
+    //   var size = this.element.getAttribute('frame-size')
+    //   console.log(size);
+    //   switch (size){
+    //     case 'fullscreen':
+    //       window.addEventListener('resize', this.sizer)
+    //       // window.addEventListener("orientationchange", this.sizer);
+    //       this.element.setAttribute('style',jsonToStyle(this.elementStyle()))
+    //       this.sizer({currentTarget: window})
+    //     break;
+    //     case 'element':
+    //       this.element.addEventListener('resize', this.sizer)
+    //       this.sizer({currentTarget: this.element})
+    //   }
+    // }
+    // this.setUpWindowSizer()
 
 
     this.setUpPenEvents = () => {
-      this.element.addEventListener('touchend', (e) => {
+      this.svg.addEventListener('touchend', (e) => {
           e.preventDefault();
       })
-      this.element.addEventListener('touchstart', (e) => {
+      this.svg.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        console.log(e);
-        if(e.target.nodeName != 'DIV'&&!showPicker){
-          this.svg.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))
+        let is = !showPicker;
+        is &= e.touches[0].target.classList[0] != 'click-box'
+        if(is){
+          this.drawSpace.appendChild(this.paths.startNewPath(e.touches[0].clientX,e.touches[0].clientY))
+        }else{
         }
       })
-      this.element.addEventListener('touchmove', (e) => {
+      this.svg.addEventListener('touchmove', (e) => {
         e.preventDefault();
-        if(e.target.nodeName != 'DIV'&&!showPicker){
+        let is = !showPicker
+        is &= e.touches[0].target.classList[0] != 'click-box'
+        if(is){
           this.paths.addCurrentPath(e.touches[0].clientX,e.touches[0].clientY)
         }
       })
@@ -80,13 +85,13 @@ class SvgDraw{
   undo(){
     let to_remove = this.paths.undo();
     if(to_remove != null){
-      this.svg.removeChild(to_remove)
+      this.drawSpace.removeChild(to_remove)
     }
   }
   redo(){
     let to_add = this.paths.redo();
     if(to_add != null){
-      this.svg.appendChild(to_add)
+      this.drawSpace.appendChild(to_add)
     }
   }
   setPenStyle(style){
@@ -94,7 +99,7 @@ class SvgDraw{
   }
   clear(){
     this.paths.clear()
-    this.svg.innerHTML = ''
+    this.drawSpace.innerHTML = ''
   }
 }
 let showPicker = false
@@ -103,10 +108,10 @@ class SvgTools{
     //An svgDraw object
     this.svgdraw = svgdraw
 
-    // --------------- BUTTON SETUP ----------------//
-    // --------- MAIN PANNEL SETUP----------------//
+    // // --------------- BUTTON SETUP ----------------//
+    // // --------- MAIN PANNEL SETUP----------------//
     this.mainPannel = document.createElement("DIV")
-    this.svgdraw.element.appendChild(this.mainPannel)
+    this.svgdraw.svg.parentNode.appendChild(this.mainPannel)
 
 
 
@@ -127,7 +132,7 @@ class SvgTools{
     this.colorPickerElement.setAttribute('style', jsonToStyle(this.pickerStyle))
     this.mainPannel.appendChild(this.colorPickerElement)
     this.colorPicker = new iro.ColorPicker(this.colorPickerElement, {
-      color: '#f6ff00',
+      color: 'hsl(338, 100%, 64%)',
       padding: 0,
       sliderSize: 35,
       borderWidth: 3,
@@ -160,81 +165,81 @@ class SvgTools{
 
 
     //---------------------BUTTON SETUP------------------------//
-    this.btnSize = '50px';
-    this.margin = '20px'
-    this.buttonStyles = (landscape) => {
-      return{
-        baseStyle:{
-          width: `calc(${this.btnSize}* 0.88)`,
-          height: `calc(${this.btnSize}* 0.88)`,
-          border: `calc(${this.btnSize} * 0.06) solid rgba(255, 255, 255, 0.5)`,
-          'border-radius': `calc(${this.btnSize} * 0.6)`,
-          display: 'inline-block',
-          position: 'fixed',
-          transition: '0.3s ease-in'
-        },
-        undo: {
-          top: this.margin,
-          left: this.margin
-        },
-        redo: {
-          top : landscape?  `calc(100% - ${this.btnSize} - ${this.margin})` : this.margin,
-          left: landscape?  this.margin                                     : `calc(100% - ${this.btnSize} - ${this.margin})`,
-        },
-        color: {
-          top : landscape ?  `calc(50% - ${this.btnSize} / 2)`  : this.margin,
-          left: landscape ?  this.margin                        : `calc(50% - ${this.btnSize} / 2)`,
-        },
-        save: {
-          bottom: this.margin,
-          right: this.margin
-        }
-      }
-    }
+    // this.btnSize = '50px';
+    // this.margin = '20px'
+    // this.buttonStyles = (landscape) => {
+    //   return{
+    //     baseStyle:{
+    //       width: `calc(${this.btnSize}* 0.88)`,
+    //       height: `calc(${this.btnSize}* 0.88)`,
+    //       border: `calc(${this.btnSize} * 0.06) solid rgba(255, 255, 255, 0.5)`,
+    //       'border-radius': `calc(${this.btnSize} * 0.6)`,
+    //       display: 'inline-block',
+    //       position: 'fixed',
+    //       transition: '0.3s ease-in'
+    //     },
+    //     undo: {
+    //       top: this.margin,
+    //       left: this.margin
+    //     },
+    //     redo: {
+    //       top : landscape?  `calc(100% - ${this.btnSize} - ${this.margin})` : this.margin,
+    //       left: landscape?  this.margin                                     : `calc(100% - ${this.btnSize} - ${this.margin})`,
+    //     },
+    //     color: {
+    //       top : landscape ?  `calc(50% - ${this.btnSize} / 2)`  : this.margin,
+    //       left: landscape ?  this.margin                        : `calc(50% - ${this.btnSize} / 2)`,
+    //     },
+    //     save: {
+    //       bottom: this.margin,
+    //       right: this.margin
+    //     }
+    //   }
+    // }
 
-    this.color = document.createElement("DIV")
-    this.undo = document.createElement("DIV")
-    this.redo = document.createElement("DIV")
-    this.save = document.createElement("DIV")
-    this.labelStyle = () => {
-      return{
-        'line-height': `calc(${this.btnSize}* 0.88)`,
-        'text-align': 'center',
-        'color': 'rgba(255, 255, 255, 0.5)',
-        width: '100%'
-      }
-    }
-    this.label_redo = document.createElement("div")
-    this.redo.appendChild(this.label_redo)
-    this.label_redo.innerHTML = 'R'
-
-    this.label_undo = document.createElement("div")
-    this.undo.appendChild(this.label_undo)
-    this.label_undo.innerHTML = 'U'
-
-    this.label_save = document.createElement("div")
-    this.save.appendChild(this.label_save)
-    this.label_save.innerHTML = 's'
+    this.pen = document.getElementById("pen")
+    this.undo = document.getElementById("undo")
+    this.redo = document.getElementById("redo")
+    this.send = document.getElementById("send")
+    // this.labelStyle = () => {
+    //   return{
+    //     'line-height': `calc(${this.btnSize}* 0.88)`,
+    //     'text-align': 'center',
+    //     'color': 'rgba(255, 255, 255, 0.5)',
+    //     width: '100%'
+    //   }
+    // }
+    // this.label_redo = document.createElement("div")
+    // this.redo.appendChild(this.label_redo)
+    // this.label_redo.innerHTML = 'R'
+    //
+    // this.label_undo = document.createElement("div")
+    // this.undo.appendChild(this.label_undo)
+    // this.label_undo.innerHTML = 'U'
+    //
+    // this.label_save = document.createElement("div")
+    // this.save.appendChild(this.label_save)
+    // this.label_save.innerHTML = 's'
 
     this.save_callback = null
 
-    this.updateButtons = (dim) => {
-      this.colorPicker.layoutDirection = dim.landscape?"horizontal":"vertical"
-      this.label_undo.setAttribute('style',jsonToStyle(this.labelStyle()))
-      this.label_redo.setAttribute('style',jsonToStyle(this.labelStyle()))
-      this.label_save.setAttribute('style',jsonToStyle(this.labelStyle()))
-      let styles = this.buttonStyles(dim.landscape)
-      for (style in styles){
-        if(style != "baseStyle"){
-          this[style].setAttribute('style', jsonToStyle(Object.assign(styles[style], styles.baseStyle)))
-        }
-      }
-      this.color.style.setProperty('background', this.svgdraw.paths.penStyle.stroke)
-    }
-    this.mainPannel.appendChild(this.undo)
-    this.mainPannel.appendChild(this.redo)
-    this.mainPannel.appendChild(this.color)
-    this.mainPannel.appendChild(this.save)
+    // this.updateButtons = (dim) => {
+    //   this.colorPicker.layoutDirection = dim.landscape?"horizontal":"vertical"
+    //   this.label_undo.setAttribute('style',jsonToStyle(this.labelStyle()))
+    //   this.label_redo.setAttribute('style',jsonToStyle(this.labelStyle()))
+    //   this.label_save.setAttribute('style',jsonToStyle(this.labelStyle()))
+    //   let styles = this.buttonStyles(dim.landscape)
+    //   for (style in styles){
+    //     if(style != "baseStyle"){
+    //       this[style].setAttribute('style', jsonToStyle(Object.assign(styles[style], styles.baseStyle)))
+    //     }
+    //   }
+    //   this.color.style.setProperty('background', this.svgdraw.paths.penStyle.stroke)
+    // }
+    // this.mainPannel.appendChild(this.undo)
+    // this.mainPannel.appendChild(this.redo)
+    // this.mainPannel.appendChild(this.color)
+    // this.mainPannel.appendChild(this.save)
 
 
 
@@ -245,10 +250,13 @@ class SvgTools{
     this.colorPicker.on('color:change', (color) => {
       // if the first color changed
       if (color.index === 0) {
-        this.color.style.setProperty('background', color.hexString)
+        this.svgdraw.svg.style.setProperty('--pen-h', color.hsl.h)
+        this.svgdraw.svg.style.setProperty('--pen-s', color.hsl.s+'%')
+        this.svgdraw.svg.style.setProperty('--pen-l', color.hsl.l+'%')
         this.svgdraw.paths.penStyle.stroke = color.hexString
       }
     });
+
     document.addEventListener('keydown', function(event) {
       if (event.ctrlKey && event.key === 'z') {
         this.svgdraw.undo();
@@ -256,21 +264,23 @@ class SvgTools{
         this.svgdraw.redo();
       }
     });
+
     this.undo.addEventListener('touchstart', () => {
       this.svgdraw.undo()
     })
     this.redo.addEventListener('touchstart', () => {
       this.svgdraw.redo()
     })
-    this.save.addEventListener('touchstart', () => {
+    this.send.addEventListener('touchstart', () => {
       if(this.save_callback != null){
-        console.log(this.svgdraw.svg);
-        this.save_callback(this.svgdraw.svg)
+        console.log(this.svgdraw.drawSpace);
+        this.save_callback(this.svgdraw.drawSpace)
       }
       this.svgdraw.clear()
     })
+
     var debug_delay = true
-    this.color.addEventListener('touchstart', () => {
+    this.pen.addEventListener('touchstart', () => {
 
       if (debug_delay){
         debug_delay = false;
@@ -285,9 +295,9 @@ class SvgTools{
 
       }
     })
-    this.svgdraw.sizeUpdate((e) => {
-      this.updateButtons(e)
-    })
+    // this.svgdraw.sizeUpdate((e) => {
+    //   this.updateButtons(e)
+    // })
   }
   onSave(callback){
     this.save_callback = callback
@@ -303,9 +313,11 @@ let jsonToStyle = (styles) => {
   }
   return style_string.substring(0, style_string.length-1)
 }
+
 let setStyle = (styles) => {
   return setAttribute('style', jsonToStyle(styles))
 }
+
 class SvgPaths{
   constructor(avg = 9){
     this.pathElements = [];
@@ -317,7 +329,7 @@ class SvgPaths{
     this.pointsBuffer = [];
     this.penStyle = {
       stroke: 'white',
-      'stroke-width': 6,
+      'stroke-width': '4',
     }
     this.r2d = (x) => {return Math.round(x*100)/100}
   }
@@ -332,12 +344,12 @@ class SvgPaths{
     this.pathElements.push(this.currentPath)
     this.history = [];
 
+    this.currentPath.setAttribute('stroke', this.penStyle.stroke)
+    this.currentPath.setAttribute('stroke-width', '7')
     let d = `M${this.r2d(x)},${this.r2d(y)}L${this.r2d(x)},${this.r2d(y)}`
 
-    this.currentPath.setAttribute('style', jsonToStyle(this.penStyle))
     this.currentPath.setAttribute("d", d)
     this.currentPath.setAttribute("fill", 'none')
-
     this.runSum = new Point(x,y)
     this.pointsBuffer = [new Point(x, y)]
     this.n = 1
